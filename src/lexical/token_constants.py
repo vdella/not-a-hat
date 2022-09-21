@@ -79,6 +79,21 @@ t_LPAREN = r'\('
 t_RPAREN = r'\)'
 
 
+NUMBER = ('INT', 'FLOAT')
+
+
+@TOKEN(r'\d+')
+def t_INT(t):
+    t.value = int(t.value)
+    return t
+
+
+@TOKEN(r'\d+\.\d+')
+def t_FLOAT(t):
+    t.value = float(t.value)
+    return t
+
+
 # Define a rule so we can track line numbers
 @TOKEN(r'\n+')
 def t_newline(t):
@@ -86,7 +101,7 @@ def t_newline(t):
 
 
 # Build the lexer
-tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + ID + EQUALS + PARENTHESIS + tuple(reserved.values())
+tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + ID + NUMBER + EQUALS + PARENTHESIS + tuple(reserved.values())
 
 
 # A string containing ignored characters (spaces and tabs)
