@@ -1,5 +1,6 @@
 import ply.lex
 from ply.lex import TOKEN
+from src.io.reader import read
 
 
 ARITHMETIC_OPERATOR = (
@@ -115,10 +116,7 @@ def t_error(t):
 
 
 # Test it out
-data = '''
-3 + 4 * 10
-  + -20 *2
-'''
+data = read('test1.c')
 
 lexer = ply.lex.lex()
 # Give the lexer some input
