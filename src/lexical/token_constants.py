@@ -40,6 +40,7 @@ r_INEQ_COMPARISON = r'!='
 reserved = {
    'if': 'IF',
    'else': 'ELSE',
+   'for': 'FOR',
    'while': 'WHILE',
    'def': 'FUNC_DEF',
    'ident': 'IDENT',
@@ -51,7 +52,7 @@ reserved = {
    'string': 'TYPE_STRING',
    'break': 'BREAK',
    'return': 'RETURN',
-   ';': 'COMMA',
+   'print': 'PRINT',
 }
 
 
@@ -70,6 +71,20 @@ EQUALS = ('EQUALS',)
 t_EQUALS = r'='
 
 
+COMMA = ('COMMA',)
+
+
+t_COMMA = r', | ;'
+
+
+BRACKETS = ('LBRACKET',
+            'RBRACKET',)
+
+
+t_LBRACKET = r'\{'
+t_RBRACKET = r'\}'
+
+
 PARENTHESIS = (
     'LPAREN',
     'RPAREN',
@@ -78,6 +93,12 @@ PARENTHESIS = (
 
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
+
+
+STRING_LITERAL = ('STRING_LITERAL',)
+
+
+t_STRING_LITERAL = r'".*"'
 
 
 NUMBER = ('INT', 'FLOAT')
@@ -102,7 +123,8 @@ def t_newline(t):
 
 
 # Build the lexer
-tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + ID + NUMBER + EQUALS + PARENTHESIS + tuple(reserved.values())
+tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + STRING_LITERAL + ID + \
+         COMMA + BRACKETS + NUMBER + EQUALS + PARENTHESIS + tuple(reserved.values())
 
 
 # A string containing ignored characters (spaces and tabs)
@@ -112,19 +134,20 @@ t_ignore = ' \t'
 # Error handling rule
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
-    t.lexer.skip(1)
+    exit(-1)
 
 
-# Test it out
-data = read('test1.c')
+if __name__ == '__main__':
+    # Test it out
+    data = read('test1.c')
 
-lexer = ply.lex.lex()
-# Give the lexer some input
-lexer.input(data)
+    lexer = ply.lex.lex()
+    # Give the lexer some input
+    lexer.input(data)
 
-# Tokenize
-while True:
-    tok = lexer.token()
-    if not tok:
-        break      # No more input
-    print(tok)
+    # Tokenize
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break      # No more input
+        print(tok)
