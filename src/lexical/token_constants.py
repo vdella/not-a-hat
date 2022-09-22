@@ -1,6 +1,17 @@
 import ply.lex
 from ply.lex import TOKEN
 from src.io.reader import read
+from src.symbol_table import print_symbol_table
+
+
+def token_list_for(given_lexer) -> list:
+    result: list = []
+    while True:
+        token = given_lexer.token()
+        if not token:
+            break
+        result.append(token)
+    return result
 
 
 ARITHMETIC_OPERATOR = (
@@ -145,9 +156,6 @@ if __name__ == '__main__':
     # Give the lexer some input
     lexer.input(data)
 
-    # Tokenize
-    while True:
-        tok = lexer.token()
-        if not tok:
-            break      # No more input
-        print(tok)
+    tokens = token_list_for(lexer)
+
+    print_symbol_table(tokens)
