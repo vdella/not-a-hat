@@ -1,7 +1,7 @@
 import ply.lex
 from ply.lex import TOKEN
 from src.io.reader import read
-from src.symbol_table import SymbolTable, token_list_for
+from src.symbol_table import SymbolTable
 
 
 ARITHMETIC_OPERATOR = (
@@ -139,15 +139,11 @@ def t_error(t):
 
 
 if __name__ == '__main__':
-    # Test it out
     data = read('test1.c')
 
     lexer = ply.lex.lex()
-    # Give the lexer some input
     lexer.input(data)
 
-    tokens = token_list_for(lexer)
-
     # Gathers all tokens into the symbol table.
-    symbol_table = SymbolTable(tokens)
+    symbol_table = SymbolTable(lexer)
     print(symbol_table)

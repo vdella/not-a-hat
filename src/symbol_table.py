@@ -1,20 +1,10 @@
 from prettytable import PrettyTable
 
 
-def token_list_for(given_lexer) -> list:
-    result: list = []
-    while True:
-        token = given_lexer.token()
-        if not token:
-            break
-        result.append(token)
-    return result
-
-
 class SymbolTable:
 
-    def __init__(self, tokens):
-        self.tokens = tokens
+    def __init__(self, lexer):
+        self.tokens = self.token_list_for(lexer)
 
         self.content: dict = {}
         digested_tokens = [[t.lexpos, t.lineno, t.type, t.value] for t in self.tokens]
@@ -37,3 +27,15 @@ class SymbolTable:
             printer.add_row([identifier, position, declaration_line, reference_line])
 
         return str(printer)
+
+    @staticmethod
+    def token_list_for(given_lexer) -> list:
+        result: list = []
+
+        while True:
+            token = given_lexer.token()
+            if not token:
+                break
+            result.append(token)
+
+        return result
