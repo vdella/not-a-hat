@@ -6,13 +6,14 @@ def hello_world()
 
 def fibonacci(int num)
 {
-    int a; 
-    int b; 
-    int c; 
+    int a;
+    int b;
+    int c;
     int i;
     i = 3;
     a = 0;
     b = 1;
+
     if(num == 1)
         print "0";
 
@@ -23,7 +24,7 @@ def fibonacci(int num)
         if (i > num){
             break;
         }
-        c = a+b;
+        c = a + b;
         print " ";
         print "c";
         a = b;
@@ -45,9 +46,9 @@ def palindrome(int a)
         if (a <= 0){
             break;
         }
-        b = a%10;
-        s = (s*10)+b;
-        a = a/10;
+        b = a % 10;
+        s = (s * 10) + b;
+        a = a / 10;
     }
 
     if(s == c)
@@ -76,9 +77,9 @@ def sum_of_digits(int n)
         if (n == 0){
             break;
         }
-        remainder = n%10;
+        remainder = n % 10;
         sum += remainder;
-        n = n/10;
+        n = n / 10;
     }
 
     	print "The sum of the digits of the number ";
@@ -91,7 +92,7 @@ def sum_of_digits(int n)
 
 def armstrong_number()
 {
-    int n,sum,i,t,a;
+    int n, sum, i, t, a;
     print "\n\n\nThe Armstrong numbers in between 1 to 500 are : \n\n\n";
 
     for(i = 1; i <= 500; i = i + 1)
@@ -102,10 +103,11 @@ def armstrong_number()
             if (t == 0) {
                 break;
             }
-            a = t%10;
-            sum += a*a*a;
-            t = t/10;
+            a = t % 10;
+            sum += a * a * a;
+            t = t / 10;
         }
+
         if(sum == i)
             print " ";
             print i;
@@ -116,6 +118,7 @@ def main()
 {
     hello_world();
     print "Printing the first 10 terms of the fibonacci sequence";
+
     int num = 10;
     fibonacci(num);
     palindrome(193848);
