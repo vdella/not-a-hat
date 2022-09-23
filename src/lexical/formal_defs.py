@@ -1,17 +1,7 @@
 import ply.lex
 from ply.lex import TOKEN
 from src.io.reader import read
-from src.symbol_table import print_symbol_table
-
-
-def token_list_for(given_lexer) -> list:
-    result: list = []
-    while True:
-        token = given_lexer.token()
-        if not token:
-            break
-        result.append(token)
-    return result
+from src.symbol_table import SymbolTable, token_list_for
 
 
 ARITHMETIC_OPERATOR = (
@@ -72,7 +62,7 @@ ID = ('ID',)
 
 @TOKEN(r'[a-zA-Z_][a-zA-Z_0-9]*')
 def t_ID(t):
-    t.type = reserved.get(t.value, 'ID')  # Checks for reserved words
+    t.type = reserved.get(t.value, 'ID')  # Checks for reserved words.
     return t
 
 
@@ -127,22 +117,22 @@ def t_FLOAT(t):
     return t
 
 
-# Define a rule so we can track line numbers
+# Define a rule so we can track line numbers.
 @TOKEN(r'\n+')
 def t_newline(t):
     t.lexer.lineno += len(t.value)
 
 
-# Build the lexer
+# Build the tokens.
 tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + STRING_LITERAL + ID + \
          COMMA + BRACKETS + NUMBER + EQUALS + PARENTHESIS + tuple(reserved.values())
 
 
-# A string containing ignored characters (spaces and tabs)
+# A string containing ignored characters (spaces and tabs).
 t_ignore = ' \t'
 
 
-# Error handling rule
+# Error handling rule.
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     exit(-1)
@@ -158,4 +148,6 @@ if __name__ == '__main__':
 
     tokens = token_list_for(lexer)
 
-    print_symbol_table(tokens)
+    # Gathers all tokens into the symbol table.
+    symbol_table = SymbolTable(tokens)
+    print(symbol_table)
