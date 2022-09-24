@@ -6,8 +6,6 @@ CCYELLOW=\033[0;33m
 CCRED=\033[0;31m
 CCEND=\033[0m
 
-src=src/lexical/formal_defs.py
-
 .PHONY:
 all: run
 
