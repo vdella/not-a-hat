@@ -150,7 +150,7 @@ flowchart LR
     q1(((q1)))
 
     q0-->|char + _|q1
-    q1-->|char + number + _|q1
+    q1-->|_ + alphanum|q1
 ```
 
 ## Assign (equals)
