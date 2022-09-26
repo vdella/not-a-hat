@@ -1,7 +1,7 @@
 # not-a-hat
 A Python application for handling CFG grammars according to the Backus-Naur Form.
 
-This project uses Poetry as its main dependency manager. For installing it, you may use
+This project uses Poetry as its main dependency manager, which was an idea that came from [here](https://github.com/lzacchi/INE5426). For installing it, you may use
 
 ```shell
 make install-poetry
