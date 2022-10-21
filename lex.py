@@ -30,7 +30,6 @@ RESERVED = {
     'for': 'FOR',
     'while': 'WHILE',
     'def': 'FUNC_DEF',
-    'ident': 'IDENT',
     'new': 'NEW_OBJ',
     'constant': 'CONST',
     'null': 'NULL_OBJ',
