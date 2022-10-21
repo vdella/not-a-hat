@@ -24,5 +24,5 @@ install:
 .PHONY:
 run:
 	@echo -e "${CCGREEN}Beggining lexical analysis!${CCEND}"
-	@poetry run python main.py
+	@poetry run python lex.py
 	@echo -e "${CCGREEN}You can find the results at output/${CCEND}"
