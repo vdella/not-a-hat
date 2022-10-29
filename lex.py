@@ -1,8 +1,9 @@
-import ply
-from ply.lex import TOKEN
+import ply.lex as lex
+from ply.lex import TOKEN, LexToken
 from src.io.reader import read
 from src.io.writer import write
 from src.symbol_table import SymbolTable
+from src.token_list import TokenList
 
 
 ARITHMETIC_OPERATOR = (
@@ -70,94 +71,100 @@ STRING_LITERAL = ('STRING_LITERAL',)
 NUMBER = ('INT', 'FLOAT')
 
 
-tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + STRING_LITERAL + ID + \
-         COMMA + BRACKETS + NUMBER + EQUALS + PARENTHESIS + SQUARE_BRACKETS + tuple(RESERVED.values())
+class Lexer(lex.Lexer):
+    tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + STRING_LITERAL + ID + \
+             COMMA + BRACKETS + NUMBER + EQUALS + PARENTHESIS + SQUARE_BRACKETS + \
+             tuple(RESERVED.values())
 
+    t_PLUS = r'\+'
+    t_MINUS = r'-'
+    t_TIMES = r'\*'
+    t_DIVIDE = r'/'
+    t_MOD = r'%'
 
-t_PLUS = r'\+'
-t_MINUS = r'-'
-t_TIMES = r'\*'
-t_DIVIDE = r'/'
-t_MOD = r'%'
+    t_LESS_THAN = r'<'
+    t_GREATER_THAN = r'>'
+    t_LESS_EQUALS_THAN = r'<='
+    t_GREATER_EQUALS_THAN = r'>='
+    t_EQ_COMPARISON = r'=='
+    r_INEQ_COMPARISON = r'!='
 
+    t_EQUALS = r'='
 
-t_LESS_THAN = r'<'
-t_GREATER_THAN = r'>'
-t_LESS_EQUALS_THAN = r'<='
-t_GREATER_EQUALS_THAN = r'>='
-t_EQ_COMPARISON = r'=='
-r_INEQ_COMPARISON = r'!='
+    t_COMMA = r', | ;'
 
+    t_LBRACKET = r'\{'
+    t_RBRACKET = r'\}'
 
-@TOKEN(r'[a-zA-Z_][a-zA-Z_0-9]*')
-def t_ID(t):
-    t.type = RESERVED.get(t.value, 'ID')  # Checks for reserved words.
-    return t
+    t_LPAREN = r'\('
+    t_RPAREN = r'\)'
 
+    t_LSQUAREBRACKET = r'\['
+    t_RSQUAREBRACKET = r'\]'
 
-t_EQUALS = r'='
+    t_STRING_LITERAL = r'".*"'
 
-t_COMMA = r', | ;'
+    def __init__(self):
+        self.__lexer = None
+        self.__src = None
 
-t_LBRACKET = r'\{'
-t_RBRACKET = r'\}'
+    @TOKEN(r'[a-zA-Z_][a-zA-Z_0-9]*')
+    def t_ID(self, t: LexToken) -> LexToken:
+        t.type = RESERVED.get(t.value, 'ID')  # Checks for reserved words.
+        return t
 
-t_LPAREN = r'\('
-t_RPAREN = r'\)'
+    @TOKEN(r'\d+')
+    def t_INT(self, t: LexToken):
+        t.value = int(t.value)
+        return t
 
-t_LSQUAREBRACKET = r'\['
-t_RSQUAREBRACKET = r'\]'
+    @TOKEN(r'\d+\.\d+')
+    def t_FLOAT(self, t: LexToken):
+        t.value = float(t.value)
+        return t
 
-t_STRING_LITERAL = r'".*"'
+    @TOKEN(r'\n+')
+    def t_newline(self, t: LexToken):
+        t.lexer.lineno += len(t.value)  # Tracks line numbers.
 
+    # A string containing ignored characters (spaces and tabs).
+    t_ignore = ' \t'
 
-@TOKEN(r'\d+')
-def t_INT(t):
-    t.value = int(t.value)
-    return t
+    def t_error(self, t: LexToken):
+        def find_column() -> int:
+            line_start = self.__src.rfind("\n", 0, t.lexpos) + 1
+            return (t.lexpos - line_start) + 1
 
+        raise Exception(
+            f"Invalid character. (line: {t.lineno} | column: {find_column()}) '{t.value[0]}'"
+        )
 
-@TOKEN(r'\d+\.\d+')
-def t_FLOAT(t):
-    t.value = float(t.value)
-    return t
+    def build(self, **kwargs):
+        self.__lexer = lex.lex(module=self, **kwargs)
 
+    def input(self, src: str, **kwargs):
+        self.__src = src
+        self.__lexer.input(self.__src, **kwargs)
+        self.__lexer.lineno = 1
 
-@TOKEN(r'\n+')
-def t_newline(t):
-    t.lexer.lineno += len(t.value)  # Tracks line numbers.
-
-
-# A string containing ignored characters (spaces and tabs).
-t_ignore = ' \t'
-
-
-def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
-    exit(-1)
+    def token(self):
+        return self.__lexer.token()
 
 
 if __name__ == '__main__':
     data = read('test1.c')
-    lexer = ply.lex.lex()
+
+    lexer = Lexer()
+    lexer.build()
     lexer.input(data)
 
     symbol_table = SymbolTable(lexer)
-    print('Printing test1 symbol table!')
+    token_list = TokenList(symbol_table.tokens)
+
+    print('Writing test1 token list!')
+    write(str(token_list), 'token_list1.txt')
 
     print('Writing test1 symbol table!')
     write(str(symbol_table), 'symbol_table1.txt')
+
     print('Done!')
-    print()
-
-    data = read('test2.c')
-    lexer = ply.lex.lex()
-    lexer.input(data)
-
-    symbol_table = SymbolTable(lexer)
-    print('Printing test2 symbol table!')
-
-    print('Writing test2 symbol table!')
-    write(str(symbol_table), 'symbol_table2.txt')
-    print('Done!')
-    print()
