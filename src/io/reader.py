@@ -10,4 +10,4 @@ def read(file) -> str:
 
 
 if __name__ == '__main__':
-    print(read('test1.c'))
+    print(read('hello_world.c'))
