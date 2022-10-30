@@ -1,9 +1,10 @@
 import ply.lex as lex
 from ply.lex import TOKEN, LexToken
-from src.io.reader import read
-from src.io.writer import write
-from src.symbol_table import SymbolTable
-from src.token_list import TokenList
+
+from io.reader import read
+from io.writer import write
+from symbol_table import SymbolTable
+from token_list import TokenList
 
 
 ARITHMETIC_OPERATOR = (

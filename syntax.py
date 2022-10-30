@@ -1,4 +1,6 @@
 from ply import yacc
+from src.lex import Lexer
+from src.io.reader import read
 
 
 def p_PROGRAM(p) -> None:
@@ -308,3 +310,18 @@ def p_LVALUE(p):
 
 
 # TODO rewrite grammar and productions within parenthesis.
+
+
+if __name__ == '__main__':
+    data = read('test1.c')
+
+    lexer = Lexer()
+    lexer.build()
+    lexer.input(data)
+
+    try:
+        syntax_result = yacc.yacc().parse(data, lexer=lexer)
+    except Exception as error:
+        print(f"Erro na etapa de análise sintática: {error}")
+
+    print("Análise sintática feita com sucesso! Não houveram erros!")

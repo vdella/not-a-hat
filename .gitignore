@@ -136,3 +136,9 @@ dmypy.json
 
 # Output dir
 output/
+
+# To prevent yacc from including unnecessary output files in git.
+parser.out
+
+# Syntax analyser grammar output
+parsetab.py
