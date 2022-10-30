@@ -1,6 +1,6 @@
 def hello_world()            
 {
-    print "Hello World";
+    print("Hello World");
     return;
 }
 
@@ -20,18 +20,7 @@ def fibonacci(int num)
     if(num >= 2)
         print "0 1";
 
-    for(;;){
-        if (i > num){
-            break;
-        }
-        c = a + b;
-        print " ";
-        print "c";
-        a = b;
-        b = c;
-        i++;
-    }
-    return
+    return;
 }
 
 def palindrome(int a)
@@ -41,15 +30,6 @@ def palindrome(int a)
     int s;
     s = 0;
     c = a;
-
-    for(;;){
-        if (a <= 0){
-            break;
-        }
-        b = a % 10;
-        s = (s * 10) + b;
-        a = a / 10;
-    }
 
     if(s == c)
     {
