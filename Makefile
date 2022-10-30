@@ -7,7 +7,7 @@ CCRED=\033[0;31m
 CCEND=\033[0m
 
 .PHONY:
-all: run
+all: install-poetry install run
 
 .PHONY:
 install-poetry:
