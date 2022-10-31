@@ -7,6 +7,10 @@ CCRED=\033[0;31m
 CCEND=\033[0m
 
 .PHONY:
+begin:
+	@poetry shell
+
+.PHONY:
 all: run
 
 .PHONY:
@@ -22,7 +26,20 @@ install:
 	@echo -e "${CCGREEN}Done!${CCEND}"
 
 .PHONY:
-run:
+shell:
+	@poetry shell
+
+.PHONY:
+run: lex_analysis syntax_analysis
+
+.PHONY:
+lex_analysis:
 	@echo -e "${CCGREEN}Beggining lexical analysis!${CCEND}"
-	@poetry run python main.py
+	@poetry run python lex.py
+	@echo -e "${CCGREEN}You can find the results at output/${CCEND}"
+
+.PHONY:
+syntax_analysis:
+	@echo -e "${CCGREEN}Beggining syntax analysis!${CCEND}"
+	@poetry run python syntax.py
 	@echo -e "${CCGREEN}You can find the results at output/${CCEND}"

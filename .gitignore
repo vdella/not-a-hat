@@ -131,6 +131,15 @@ dmypy.json
 # PyCharm .idea folder
 .idea
 
-
 # Mac OS .DS_Store folders
 .DS_Store
+
+# Output dir
+output/symbol_table*.txt
+output/token_list*.txt
+
+# To prevent yacc from including unnecessary output files in git.
+parser.out
+
+# Syntax analyser grammar output
+parsetab.py
