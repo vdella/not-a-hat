@@ -1,5 +1,6 @@
 from ply import yacc
-from src.lex import Lexer
+
+from lex import Lexer
 from src.io.reader import read
 
 
@@ -36,9 +37,9 @@ def p_FUNCDEF(p) -> None:
 
 def p_DATATYPE(p) -> None:
     """
-    DATATYPE : INT
-             | FLOAT
-             | STRING_LITERAL
+    DATATYPE : INT_TYPE
+             | FLOAT_TYPE
+             | STRING_TYPE
     """
     pass
 
@@ -61,21 +62,36 @@ def p_PARAMLISTTMP(p) -> None:
 
 def p_STATEMENT(p) -> None:
     """
-    STATEMENT : VARDECL COMMA
-              | ATRIBSTAT COMMA
-              | PRINTSTAT COMMA
-              | READSTAT COMMA
-              | RETURNSTAT COMMA
+    STATEMENT : VARDECL SEMICOLON
+              | ATRIBSTAT SEMICOLON
+              | PRINTSTAT SEMICOLON
+              | READSTAT SEMICOLON
+              | RETURNSTAT SEMICOLON
               | IFSTAT
               | FORSTAT
               | STATELIST_STATEMENT
-              | BREAK
-              | COMMA
+              | BREAK SEMICOLON
+              | SEMICOLON
     """
     pass
 
 
-def p_OPTIONAL_VECTOR(p):
+def p_STATELIST_STATEMENT(p) -> None:
+    """
+    STATELIST_STATEMENT : LBRACKET STATELIST RBRACKET
+    """
+    pass
+
+
+def p_VARDECL(p) -> None:
+    """
+    VARDECL : DATATYPE ID OPTIONAL_VECTOR
+            | DATATYPE ID ATTRIBUTION ATRIB_RIGHT
+    """
+    pass
+
+
+def p_OPTIONAL_VECTOR(p) -> None:
     """
     OPTIONAL_VECTOR : LSQUAREBRACKET INT RSQUAREBRACKET OPTIONAL_VECTOR
                     | empty
@@ -83,47 +99,55 @@ def p_OPTIONAL_VECTOR(p):
     pass
 
 
-def p_VARDECL(p):
+def p_ATRIB_RIGHT(p) -> None:
     """
-    VARDECL : DATATYPE ID OPTIONAL_VECTOR
-    """
-    pass
-
-
-def p_EXPRESSION_CHOOSER(p):
-    """
-    EXPRESSION_CHOOSER : EXPRESSION
-                       | ALLOCEXPRESSION
-                       | FUNCCALL
+    ATRIB_RIGHT : ALLOCEXPRESSION
+                | EXPRESSION_OR_FUNCCALL
     """
     pass
 
 
-def p_ATRIBSTAT(p):
+def p_EXPRESSION_OR_FUNCCALL(p) -> None:
     """
-    ATRIBSTAT : LVALUE EQUALS LPAREN EXPRESSION_CHOOSER RPAREN
-    """
-
-
-def p_FUNCCALL(p):
-    """
-    FUNCCALL : ID LPAREN PARAMLIST CALL RPAREN
-    """
-    pass
-
-
-def p_INNERPARAMLISTCALL(p):
-    """
-    INNERPARAMLISTCALL : ID COMMA PARAMLISTCALL
-                       | ID
+    EXPRESSION_OR_FUNCCALL : PLUS FACTOR RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                           | MINUS FACTOR RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                           | INT RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                           | FLOAT RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                           | STRING_LITERAL RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                           | NULL RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                           | LPAREN NUMEXPRESSION RPAREN RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                           | ID FOLLOW_LABEL
     """
     pass
 
 
-def p_PARAMLISTCALL(p):
+def p_FOLLOW_LABEL(p) -> None:
     """
-    PARAMLISTCALL : LPAREN INNERPARAMLISTCALL RPAREN
+    FOLLOW_LABEL : OPTIONAL_ALLOC_NUMEXPRESSION RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
+                 | LPAREN PARAMLISTCALL RPAREN
+    """
+    pass
+
+
+def p_ATRIBSTAT(p) -> None:
+    """
+    ATRIBSTAT : LVALUE ATTRIBUTION ATRIB_RIGHT
+    """
+    pass
+
+
+def p_PARAMLISTCALL(p) -> None:
+    """
+    PARAMLISTCALL : ID PARAMLISTCALLTMP
                   | empty
+    """
+    pass
+
+
+def p_PARAMLISTCALLTMP(p) -> None:
+    """
+    PARAMLISTCALLTMP : COMMA PARAMLISTCALL
+                     | empty
     """
     pass
 
@@ -145,6 +169,10 @@ def p_READSTAT(p):
 def p_RETURNSTAT(p):
     """
     RETURNSTAT : RETURN
+               | RETURN INT
+               | RETURN FLOAT
+               | RETURN STRING_LITERAL
+               | RETURN EXPRESSION_OR_FUNCCALL
     """
     pass
 
@@ -164,53 +192,46 @@ def p_OPTIONAL_ELSE(p):
     pass
 
 
-def p_PREPARE_FOR(p):
+def p_FORSTAT(p) -> None:
     """
-    PREPARE_FOR : ATRIBSTAT COMMA EXPRESSION COMMA ATRIBSTAT
-    """
-    pass
-
-
-def p_FORSTAT(p):
-    """
-    FORSTAT : FOR LPAREN PREPARE_FOR RPAREN STATEMENT
+    FORSTAT : FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN STATEMENT
     """
     pass
 
 
-def p_INNERSTATELIST(p):
+def p_STATELIST(p: yacc.YaccProduction) -> None:
     """
-    INNERSTATELIST : STATELIST
-                   | empty
-    """
-    pass
-
-
-def p_STATELIST(p):
-    """
-    STATELIST : STATEMENT INNERSTATELIST
+    STATELIST : STATEMENT OPTIONAL_STATELIST
     """
     pass
 
 
-def p_MULTIPLE_NUMEXPRESSIONS(p):
+def p_OPTIONAL_STATELIST(p) -> None:
     """
-    MULTIPLE_NUMEXPRESSIONS : LSQUAREBRACKET NUMEXPRESSION RSQUAREBRACKET
+    OPTIONAL_STATELIST : STATELIST
+                       | empty
+    """
+    pass
+
+
+def p_ALLOCEXPRESSION(p) -> None:
+    """
+    ALLOCEXPRESSION : NEW DATATYPE LSQUAREBRACKET NUMEXPRESSION RSQUAREBRACKET OPTIONAL_ALLOC_NUMEXPRESSION
     """
     pass
 
 
 def p_OPTIONAL_ALLOC_NUMEXPRESSION(p) -> None:
     """
-    OPTIONAL_ALLOC_NUMEXPRESSION : LEFT_SQUARE_BRACKET NUMEXPRESSION RIGHT_SQUARE_BRACKET OPTIONAL_ALLOC_NUMEXPRESSION
+    OPTIONAL_ALLOC_NUMEXPRESSION : LSQUAREBRACKET NUMEXPRESSION RSQUAREBRACKET OPTIONAL_ALLOC_NUMEXPRESSION
                                  | empty
     """
     pass
 
 
-def p_ALLOCEXPRESSION(p):
+def p_EXPRESSION(p) -> None:
     """
-    ALLOCEXPRESSION : NEW DATATYPE LEFT_SQUARE_BRACKET NUMEXPRESSION RIGHT_SQUARE_BRACKET OPTIONAL_ALLOC_NUMEXPRESSION
+    EXPRESSION : NUMEXPRESSION OPTIONAL_REL_OP_NUMEXPRESSION
     """
     pass
 
@@ -227,28 +248,22 @@ def p_REL_OP(p):
     pass
 
 
-def p_OPTIONAL_REL_OP_NUMEXPRESSION(p):
+def p_OPTIONAL_REL_OP_NUMEXPRESSION(p) -> None:
     """
     OPTIONAL_REL_OP_NUMEXPRESSION : REL_OP NUMEXPRESSION
                                   | empty
     """
-
-
-def p_EXPRESSION(p):
-    """
-    EXPRESSION : NUMEXPRESSION OPTIONAL_REL_OP_NUMEXPRESSION
-    """
     pass
 
 
-def p_NUMEXPRESSION(p):
+def p_NUMEXPRESSION(p) -> None:
     """
     NUMEXPRESSION : TERM RECURSIVE_MINUS_OR_PLUS
     """
     pass
 
 
-def p_RECURSIVE_MINUS_OR_PLUS(p):
+def p_RECURSIVE_MINUS_OR_PLUS(p) -> None:
     """
     RECURSIVE_MINUS_OR_PLUS : MINUS_OR_PLUS TERM RECURSIVE_MINUS_OR_PLUS
                             | empty
@@ -256,7 +271,7 @@ def p_RECURSIVE_MINUS_OR_PLUS(p):
     pass
 
 
-def p_MINUS_OR_PLUS(p):
+def p_MINUS_OR_PLUS(p) -> None:
     """
     MINUS_OR_PLUS : MINUS
                   | PLUS
@@ -264,14 +279,14 @@ def p_MINUS_OR_PLUS(p):
     pass
 
 
-def p_TERM(p):
+def p_TERM(p) -> None:
     """
     TERM : UNARYEXPR RECURSIVE_UNARYEXPR
     """
     pass
 
 
-def p_RECURSIVE_UNARYEXPR(p):
+def p_RECURSIVE_UNARYEXPR(p) -> None:
     """
     RECURSIVE_UNARYEXPR : UNARYEXPR_OPERATOR TERM
                         | empty
@@ -279,49 +294,60 @@ def p_RECURSIVE_UNARYEXPR(p):
     pass
 
 
-def p_UNARYEXPR_OPERATOR(p):
+def p_UNARYEXPR_OPERATOR(p) -> None:
     """
     UNARYEXPR_OPERATOR : TIMES
-                       | DIVISION
-                       | MODULO
+                       | DIVIDE
+                       | MOD
     """
     pass
 
 
-def p_UNARYEXPR(p):
+def p_UNARYEXPR(p) -> None:
     """
-    UNARYEXPR : MINUS_OR_PLUS FACTOR | FACTOR
+    UNARYEXPR : MINUS_OR_PLUS FACTOR
+              | FACTOR
     """
     pass
 
 
 def p_FACTOR(p):
     """
-    FLOAT : INT | FLOAT | STRING_LITERAL | NULL | LVALUE | LPAREN NUMEXPRESSION RPAREN
+    FACTOR : INT
+           | FLOAT
+           | STRING_LITERAL
+           | NULL
+           | LVALUE
+           | LPAREN NUMEXPRESSION RPAREN
     """
     pass
 
 
-def p_LVALUE(p):
+def p_LVALUE(p) -> None:
     """
-    LVALUE : LABEL OPTIONAL_ALLOC_NUMEXPRESSION
+    LVALUE : ID OPTIONAL_ALLOC_NUMEXPRESSION
     """
     pass
 
 
-# TODO rewrite grammar and productions within parenthesis.
+def p_error(p: yacc.YaccProduction) -> None:
+    raise Exception(f"Syntax error at token {p}")
+
+
+def p_empty(p) -> None:
+    """
+    empty :
+    """
+    pass
 
 
 if __name__ == '__main__':
-    data = read('test1.c')
+    data = read('hello_world.c')
 
     lexer = Lexer()
     lexer.build()
     lexer.input(data)
 
-    try:
-        syntax_result = yacc.yacc().parse(data, lexer=lexer)
-    except Exception as error:
-        print(f"Erro na etapa de análise sintática: {error}")
+    tokens = lexer.tokens
 
-    print("Análise sintática feita com sucesso! Não houveram erros!")
+    _ = yacc.yacc().parse(data, lexer=lexer)
