@@ -7,7 +7,11 @@ CCRED=\033[0;31m
 CCEND=\033[0m
 
 .PHONY:
-all: install-poetry install run
+begin:
+	@poetry shell
+
+.PHONY:
+all: run
 
 .PHONY:
 install-poetry:
@@ -20,6 +24,10 @@ install:
 	@echo -e "${CCGREEN}Downloading dependencies using Poetry...${CCEND}"
 	@poetry install
 	@echo -e "${CCGREEN}Done!${CCEND}"
+
+.PHONY:
+shell:
+	@poetry shell
 
 .PHONY:
 run: lex_analysis syntax_analysis
