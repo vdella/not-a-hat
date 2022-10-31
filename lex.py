@@ -1,10 +1,10 @@
 import ply.lex as lex
 from ply.lex import TOKEN, LexToken
 
-from io.reader import read
-from io.writer import write
-from symbol_table import SymbolTable
-from token_list import TokenList
+from src.io.reader import read
+from src.io.writer import write
+from src.symbol_table import SymbolTable
+from src.token_list import TokenList
 
 
 ARITHMETIC_OPERATOR = (
@@ -30,14 +30,13 @@ RESERVED = {
     'if': 'IF',
     'else': 'ELSE',
     'for': 'FOR',
-    'while': 'WHILE',
     'def': 'FUNC_DEF',
-    'new': 'NEW_OBJ',
-    'constant': 'CONST',
-    'null': 'NULL_OBJ',
-    'int': 'TYPE_INT',
-    'float': 'TYPE_FLOAT',
-    'string': 'TYPE_STRING',
+    'int': 'INT_TYPE',
+    'float': 'FLOAT_TYPE',
+    'string': 'STRING_TYPE',
+    'new': 'NEW',
+    'read': 'READ',
+    'null': 'NULL',
     'break': 'BREAK',
     'return': 'RETURN',
     'print': 'PRINT',
@@ -46,10 +45,13 @@ RESERVED = {
 ID = ('ID',)
 
 
-EQUALS = ('EQUALS',)
+ATTRIBUTION = ('ATTRIBUTION',)
 
 
 COMMA = ('COMMA',)
+
+
+SEMICOLON = ('SEMICOLON',)
 
 
 BRACKETS = ('LBRACKET',
@@ -69,12 +71,13 @@ SQUARE_BRACKETS = ('LSQUAREBRACKET',
 STRING_LITERAL = ('STRING_LITERAL',)
 
 
-NUMBER = ('INT', 'FLOAT')
+INT = ('INT',)
+FLOAT = ('FLOAT',)
 
 
 class Lexer(lex.Lexer):
-    tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + STRING_LITERAL + ID + \
-             COMMA + BRACKETS + NUMBER + EQUALS + PARENTHESIS + SQUARE_BRACKETS + \
+    tokens = ARITHMETIC_OPERATOR + LOGICAL_OPERATOR + STRING_LITERAL + INT + FLOAT + ID + \
+             COMMA + SEMICOLON + BRACKETS + ATTRIBUTION + PARENTHESIS + SQUARE_BRACKETS + \
              tuple(RESERVED.values())
 
     t_PLUS = r'\+'
@@ -90,9 +93,10 @@ class Lexer(lex.Lexer):
     t_EQ_COMPARISON = r'=='
     r_INEQ_COMPARISON = r'!='
 
-    t_EQUALS = r'='
+    t_ATTRIBUTION = r'='
 
-    t_COMMA = r', | ;'
+    t_COMMA = r','
+    t_SEMICOLON = r';'
 
     t_LBRACKET = r'\{'
     t_RBRACKET = r'\}'
@@ -153,7 +157,7 @@ class Lexer(lex.Lexer):
 
 
 if __name__ == '__main__':
-    data = read('test1.c')
+    data = read('hello_world.c')
 
     lexer = Lexer()
     lexer.build()
