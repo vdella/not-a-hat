@@ -1,7 +1,8 @@
 from ply import yacc
 from exceptions import InvalidBreakError, InvalidSyntaxError
 from lexer import Lexer
-from data import EntryTable, TreeNode
+from table import EntryTable
+from tree import TreeNode
 from typecheck import check_valid_operation
 from utils import *
 

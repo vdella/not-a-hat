@@ -1,4 +1,4 @@
-from data import TreeNode
+from tree import TreeNode
 from exceptions import InvalidBinaryOperation
 from reader import parse_arguments
 

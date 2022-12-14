@@ -1,5 +1,4 @@
-from data import Scope
-from data import ScopeStack
+from scope import Scope, ScopeStack
 from exceptions import VariableNotDeclared
 from pprint import pprint
 
