@@ -6,8 +6,6 @@ CCYELLOW=\033[0;33m
 CCRED=\033[0;31m
 CCEND=\033[0m
 
-# src=test-code/syntax-analysis/success.c
-src=test-code/syntax-analysis/printstat.c
 program_1=test-code/program1.c
 program_2=test-code/program2.c
 program_3=test-code/program3.c
@@ -69,14 +67,3 @@ run:
 	@poetry run python src/main.py --src ${program_4} > output/program4.txt
 
 	@echo -e "${CCGREEN}Done! Outputs can be found at output/${CCEND}"
-
-
-.PHONY:
-example:
-	@echo -e "${GREEN}Executando main lexer.py...${CCEND}"
-	@echo -e "Se voce nao especificou um programa fonte"
-	@echo -e "um arquivo de exemplo sera utilizado."
-	@echo -e "Voce pode muda-lo utilizando o comando ${CCYELLOW}make run src=<path/to/file>${CCEND}"
-
-	@echo -e "${CCYELLOW}Executando o arquivo de exemplo...${CCEND}"
-	@poetry run python src/main.py --src ${src}
