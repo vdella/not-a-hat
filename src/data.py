@@ -1,17 +1,8 @@
-#
-# data.py
-#
-# Authors: Artur Barichello
-#          Lucas Verdade
-#          Lucas Zacchi
-
-# Data structures used in the semantic analysis step
-
 import uuid
 from collections import deque
 from dataclasses import dataclass
 from typing import List, Optional, Union, Dict, Tuple, Any, Deque
-from output import VariableInScopeError
+from exceptions import VariableInScopeError
 from enum import Enum, auto
 
 

@@ -1,15 +1,5 @@
-#
-# parser.py
-#
-# Authors: Artur Barichello
-#          Lucas Verdade
-#          Lucas Zacchi
-#
-# Arquivo utilizado para análise sintática
-#
-
 from ply import yacc
-from output import InvalidSyntaxError
+from exceptions import InvalidSyntaxError
 from lexer import Lexer
 
 

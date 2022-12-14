@@ -1,14 +1,6 @@
-#
-# Authors: Artur Barichello
-#          Lucas Verdade
-#          Lucas Zacchi
-
-# Structures used to check if binary operations
-# are made using valid types
-
-
 from data import TreeNode
-from output import InvalidBinaryOperation, parse_arguments
+from exceptions import InvalidBinaryOperation
+from reader import parse_arguments
 
 
 def check_valid_operation(

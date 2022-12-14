@@ -1,27 +1,9 @@
-#
-# main.py
-#
-# Authors: Artur Barichello
-#          Lucas Verdade
-#          Lucas Zacchi
-#
-#
-
 from argparse import Namespace
 import sys
-import ply.yacc as yacc
-from lexer import Lexer
-from output import parse_arguments, print_separator
-from pprint import pprint
-
-# Ply necessary imports
-from lexer import TOKENS as tokens
+from reader import parse_arguments
+from writer import print_separator
 from syntax import *
 from parser import syntax_lexer
-
-# Isso limita o traceback para aparecer só o erro criado
-# sys.tracebacklimit = 0
-
 
 def main(args: Namespace) -> None:
     with open(args.src) as f:
