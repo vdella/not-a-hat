@@ -135,8 +135,7 @@ dmypy.json
 .DS_Store
 
 # Output dir
-output/symbol_table*.txt
-output/token_list*.txt
+output/
 
 # To prevent yacc from including unnecessary output files in git.
 parser.out

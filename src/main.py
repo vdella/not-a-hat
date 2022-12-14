@@ -1,9 +1,11 @@
 from argparse import Namespace
 import sys
-import ply.yacc as yacc
+
 from lex import Lexer
-from output import parse_arguments, print_separator
-from pprint import pprint
+from reader import parse_arguments
+from writer import print_separator
+from token_list import TokenList
+from symbol_table import SymbolTable
 
 # Ply necessary imports
 from syntax import *
@@ -11,6 +13,7 @@ from parser import syntax_lexer
 
 # Isso limita o traceback para aparecer só o erro criado
 # sys.tracebacklimit = 0
+
 
 def main(vargs: Namespace) -> None:
     with open(vargs.src) as f:
@@ -21,14 +24,17 @@ def main(vargs: Namespace) -> None:
     lexer.input(src)
 
     try:
-        token_list = Lexer.tokens
+        tokens = Lexer.tokens
     except Exception as err:
-        print(f"Erro na etapa de tokenização {err}")
+        print(f"Tokenization error: {err}")
         sys.exit(-1)
 
     # Prints da entrega 1:
-    # print_tokens(token_list)
-    # print_symbol_table(token_list)
+    tokens = TokenList(tokens)
+    print(tokens)
+
+    symbol_table = SymbolTable()
+    print(token_list)
     print_separator()
 
     try:

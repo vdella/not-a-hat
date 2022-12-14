@@ -1,17 +1,10 @@
-#
-# syntax.py
-#
-# Authors: Artur Barichello
-#          Lucas Verdade
-#          Lucas Zacchi
-#
 # Arquivo utilizado para análise sintática e
 # análise semântica do código
 
 from ply import yacc
 from typing import Any, Dict, List, Tuple
-from output import InvalidBreakError, InvalidSyntaxError, VariableNotDeclared
-from lexer import Lexer
+from exceptions import InvalidBreakError, InvalidSyntaxError, VariableNotDeclared
+from lex import Lexer
 from data import ScopeStack, EntryTable, Scope, TreeNode
 from typecheck import check_valid_operation
 from pprint import pprint

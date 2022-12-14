@@ -1,7 +1,7 @@
 from ply import yacc
 
 from lex import Lexer
-from src.io.reader import read
+from reader import read
 
 
 def p_PROGRAM(p) -> None:
