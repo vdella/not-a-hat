@@ -1,11 +1,3 @@
--- program3.lua
---
--- Authors: Artur Barichello
---          Lucas Verdade
---          Lucas Zacchi
--- Algorithm: Theater seats system
-
--- defining functions
 def initialize_theater_system(int n_seats, string name){
     string theater_name;
     int max_seats;

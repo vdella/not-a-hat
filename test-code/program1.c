@@ -1,7 +1,3 @@
--- Program that calculates the average notes
--- from an array of students
-
-
 def print_congrulatory_message(int grade, int i) {
   print "Congratulations, ";
   print ". You are approved!";

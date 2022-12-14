@@ -1,14 +1,3 @@
---
--- smh.lua
---
--- Authors: Artur Barichello
---          Lucas Verdade
---          Lucas Zacchi
-
--- Código: smh.lua
--- SMH: Simple Math Helper
--- Algorithm: Math functions to help your code to be cleaner
-
 def pow(float base, int exponent, float retval){
   int i;
   float mult;
