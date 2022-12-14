@@ -1,12 +1,3 @@
-# output.py
-#
-# Authors: Artur Barichello
-#          Lucas Verdade
-#          Lucas Zacchi
-#
-# Helper functions to output data into terminal
-#
-
 import argparse
 from typing import List
 from pprint import pprint
@@ -26,33 +17,6 @@ def parse_arguments() -> argparse.Namespace:
         action="store_true",
     )
     return parser.parse_args()
-
-
-# --- Compiler generated errors ---
-
-
-class InvalidTokenError(Exception):
-    pass
-
-
-class VariableNotDeclared(Exception):
-    pass
-
-
-class VariableInScopeError(Exception):
-    pass
-
-
-class InvalidBreakError(Exception):
-    pass
-
-
-class InvalidBinaryOperation(Exception):
-    pass
-
-
-class InvalidSyntaxError(Exception):
-    pass
 
 
 # --- Output helper functions ---

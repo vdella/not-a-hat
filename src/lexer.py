@@ -1,19 +1,8 @@
-#
-# lexer.py
-#
-# Authors: Artur Barichello
-#          Lucas Verdade
-#          Lucas Zacchi
-
-# Comments with 'updated' indicate where the grammar
-# has been modified to mirror operators used in the
-# Lua language (https://www.lua.org/)
-
 import ply.lex as lex
 from ply.lex import Lexer
 from ply.lex import LexToken
 from typing import List, Any
-from output import InvalidTokenError
+from exceptions import InvalidTokenError
 
 RESERVED = {
     "def": "FUNCTION_DECLARATION",
@@ -91,7 +80,7 @@ class Lexer(Lexer):
     t_RIGHT_SQUARE_BRACKET = r"\]"
 
     t_ignore = " \t"  # updated
-    t_ignore_COMMENTS = r"--.*"  # updated
+    t_ignore_COMMENTS = r"//.*"  # updated
     t_NULL = r"nil"  # updated
     t_ATTRIBUTION = r"="
     t_STRING_CONSTANT = r'".*"'
