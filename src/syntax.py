@@ -1,16 +1,13 @@
 from ply import yacc
-from exceptions import InvalidBreakError, InvalidSyntaxError, VariableNotDeclared
+from exceptions import InvalidBreakError, InvalidSyntaxError
 from lexer import Lexer
-from data import ScopeStack, EntryTable, Scope, TreeNode
+from data import EntryTable, TreeNode
 from typecheck import check_valid_operation
-from pprint import pprint
+from utils import *
 
-lexer = Lexer()
-lexer.build()
-tokens = lexer.tokens
+tokens = Lexer.tokens
 
 expressions = list()
-scopes = ScopeStack()
 
 
 def p_PROGRAM(p: yacc.YaccProduction):
@@ -19,7 +16,7 @@ def p_PROGRAM(p: yacc.YaccProduction):
             | NEW_SCOPE FUNCLIST
             | empty
     """
-    p[0] = {"scopes": scopes.pop().as_dict(), "expressions": numexpression_as_dict()}
+    p[0] = {"scopes": scopes.pop().as_dict(), "expressions": numexpressions_from(expressions)}
     # Stack must be empty otherwise we have a missing scope error
     assert (
         scopes.is_empty()
@@ -317,9 +314,9 @@ def p_EXPRESSION_OR_FUNCCALL_LABEL(p: yacc.YaccProduction):
     """
     EXPRESSION_OR_FUNCCALL : LABEL FOLLOW_LABEL
     """
-    node = TreeNode(None, None, p[1], get_variable_type(p[1], p.lineno(1)))
+    node = TreeNode(None, None, p[1], variable_type(p[1], p.lineno(1)))
 
-    if p[2] is None or p[2]["node"] == None:
+    if p[2] is None or p[2]["node"] is None:
         return
 
     if p[2]:
@@ -494,33 +491,33 @@ def p_OPTIONAL_REL_OP_NUMEXPRESSION(p: yacc.YaccProduction):
         expressions.append((numexpr_node, p.lineno(1)))
 
 
-def p_REL_OP_LESSER_THAN(p: yacc.YaccProduction):
+def p_REL_OP_LESSER_THAN(p):
     """
     REL_OP : LESSER_THAN
     """
     pass
 
 
-def p_REL_OP_GREATER_THAN(p: yacc.YaccProduction):
+def p_REL_OP_GREATER_THAN(p):
     """REL_OP : GREATER_THAN"""
     pass
 
 
-def p_REL_OP_LOWER_OR_EQUAL_THAN(p: yacc.YaccProduction):
+def p_REL_OP_LOWER_OR_EQUAL_THAN(p):
     """REL_OP : LESS_OR_EQUAL_THAN"""
     pass
 
 
-def p_REL_OP_GREATER_OR_EQUAL_THAN(p: yacc.YaccProduction):
+def p_REL_OP_GREATER_OR_EQUAL_THAN(p):
     """REL_OP : GREATER_OR_EQUAL_THAN"""
 
 
-def p_REL_OP_EQUAL(p: yacc.YaccProduction):
+def p_REL_OP_EQUAL(p):
     """REL_OP : EQUAL"""
     pass
 
 
-def p_REL_OP_NOT_EQUAL(p: yacc.YaccProduction):
+def p_REL_OP_NOT_EQUAL(p):
     """REL_OP : NOT_EQUAL"""
     pass
 
@@ -690,7 +687,7 @@ def p_LVALUE(p: yacc.YaccProduction):
     """
     label = p[1]
     optional_alloc_numexpr = p[2]
-    res_type = get_variable_type(label, p.lineno(1))
+    res_type = variable_type(label, p.lineno(1))
     p[0] = {
         "node": TreeNode(
             None,
@@ -725,49 +722,3 @@ def p_NEW_SCOPE_LOOP(p: yacc.YaccProduction):
     NEW_LOOP_SCOPE :
     """
     create_scope(True)
-
-
-# --- Util functions ---
-
-
-def create_scope(loop: bool):
-    """
-    Scope management list
-    """
-    top = scopes.seek()
-    new = Scope(outer_scope=top, loop=loop)
-    if top:
-        top.add_inner_scope(new)
-    scopes.push(new)
-
-
-def get_variable_type(label: str, lineno: int):
-    """
-    Get variable type
-    Used during TreeNode construction in LVALUEs
-    """
-    scope = scopes.seek()
-    while True:
-        for entry in scope.entry_table:
-            if entry.label == label:
-                return entry.datatype
-
-        scope = scope.outer_scope
-        if scope is None:
-            break
-    raise VariableNotDeclared(f"Variável não declarada '{label}' na linha: {lineno})")
-
-
-def numexpression_as_dict() -> list:
-    exp_dict = list()
-
-    for exp, lineno in expressions:
-        if exp.left is None and exp.right is None:
-            continue
-
-        exp_dict.append(
-            {"Node Id:": str(exp.id), "lineno": lineno, "tree": exp.as_dict()}
-        )
-    pprint(exp_dict)
-
-    return exp_dict  # As a list of dicts.

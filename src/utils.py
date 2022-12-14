@@ -28,7 +28,7 @@ def variable_type(label: str, lineno: int):  # Used during TreeNode construction
         scope = scope.outer_scope
         if scope is None:
             break
-    raise VariableNotDeclared(f"Variável não declarada '{label}' na linha: {lineno})")
+    raise VariableNotDeclared(f"Undeclared variable '{label}' at line {lineno})")
 
 
 def numexpressions_from(expressions) -> list:
