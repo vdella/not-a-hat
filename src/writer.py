@@ -3,12 +3,12 @@ from tabulate import tabulate
 
 def print_tokens(tokens) -> None:
     result = [(t.type, t.value) for t in tokens]
-    pprint("\nPrinting token list: ('Token enumerator', 'Token value'):")
+    pprint("Printing token list: ('Token enumerator', 'Token value'):")
     pprint(result, indent=4)
 
 
 def print_symbol_table(tokens) -> None:
-    print("\nPrinting symbol table:")
+    print("Printing symbol table:")
 
     symbol_table: dict = {}
     token_table = [[t.lexpos, t.lineno, t.type, t.value] for t in tokens]

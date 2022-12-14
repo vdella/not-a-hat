@@ -1,5 +1,4 @@
 from ply import yacc
-from typing import Any, Dict, List, Tuple
 from exceptions import InvalidBreakError, InvalidSyntaxError, VariableNotDeclared
 from lexer import Lexer
 from data import ScopeStack, EntryTable, Scope, TreeNode
@@ -10,33 +9,11 @@ lexer = Lexer()
 lexer.build()
 tokens = lexer.tokens
 
-# Data structures
-expressions: List[Tuple[TreeNode, int]] = []
+expressions = list()
 scopes = ScopeStack()
 
-# As definicoes abaixo lidam com as producoes da gramatica
-# e foram definidas seguindo o exemplo da documentação do
-# ply Yacc.
-#
-# Exemplo:
-# Get the token map from the lexer. This is required.
-#
-#     from calclex import tokens
-#
-#     def p_expression_plus(p):
-#         'expression : expression PLUS term'
-#         p[0] = p[1] + p[3]
-#
-# Para a entrega 3 foram adicionados alguns itens na gramática
-# para poder fazer a lógica de escopos.
-#
-# Referência: https://www.dabeaz.com/ply/ply.html#ply_nn24
-#
-#
-# --- Yacc rules ---
 
-
-def p_PROGRAM(p: yacc.YaccProduction) -> None:
+def p_PROGRAM(p: yacc.YaccProduction):
     """
     PROGRAM : NEW_SCOPE STATEMENT
             | NEW_SCOPE FUNCLIST
@@ -46,17 +23,17 @@ def p_PROGRAM(p: yacc.YaccProduction) -> None:
     # Stack must be empty otherwise we have a missing scope error
     assert (
         scopes.is_empty()
-    ), "Erro de escopo, verifique se faltam ';' ou 'return;' nas funções"
+    ), "Scope error! Verify missing ;"
 
 
-def p_FUNCLIST(p: yacc.YaccProduction) -> None:
+def p_FUNCLIST(p):
     """
     FUNCLIST : FUNCDEF FUNCLISTTMP
     """
     pass
 
 
-def p_FUNCLISTTMP(p: yacc.YaccProduction) -> None:
+def p_FUNCLISTTMP(p):
     """
     FUNCLISTTMP : FUNCLIST
                 | empty
@@ -64,7 +41,7 @@ def p_FUNCLISTTMP(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_FUNCDEF(p: yacc.YaccProduction) -> None:
+def p_FUNCDEF(p):
     """
     FUNCDEF : FUNCTION_DECLARATION LABEL NEW_SCOPE LEFT_PARENTHESIS PARAMLIST RIGHT_PARENTHESIS LEFT_BRACKET STATELIST RIGHT_BRACKET
     """
@@ -84,7 +61,7 @@ def p_FUNCDEF(p: yacc.YaccProduction) -> None:
         current_scope.add_entry(new_func)
 
 
-def p_DATATYPE(p: yacc.YaccProduction) -> None:
+def p_DATATYPE(p: yacc.YaccProduction):
     """
     DATATYPE : INTEGER
              | FLOATING_POINT
@@ -93,7 +70,7 @@ def p_DATATYPE(p: yacc.YaccProduction) -> None:
     p[0] = p[1]
 
 
-def p_PARAMLIST(p: yacc.YaccProduction) -> None:
+def p_PARAMLIST(p: yacc.YaccProduction):
     """
     PARAMLIST : DATATYPE LABEL PARAMLISTTMP
               | empty
@@ -116,7 +93,7 @@ def p_PARAMLIST(p: yacc.YaccProduction) -> None:
             current_scope.add_entry(paramlist)
 
 
-def p_PARAMLISTTMP(p: yacc.YaccProduction) -> None:
+def p_PARAMLISTTMP(p):
     """
     PARAMLISTTMP : COMMA PARAMLIST
                  | empty
@@ -124,7 +101,7 @@ def p_PARAMLISTTMP(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_STATEMENT(p: yacc.YaccProduction) -> None:
+def p_STATEMENT(p):
     """
     STATEMENT : VARDECL SEMICOLON
               | ATRIBSTAT SEMICOLON
@@ -140,7 +117,7 @@ def p_STATEMENT(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_STATELIST_STATEMENT(p: yacc.YaccProduction) -> None:
+def p_STATELIST_STATEMENT(p):
     """
     STATELIST_STATEMENT : NEW_SCOPE LEFT_BRACKET STATELIST RIGHT_BRACKET
     """
@@ -148,7 +125,7 @@ def p_STATELIST_STATEMENT(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_BREAK_STATEMENT(p: yacc.YaccProduction) -> None:
+def p_BREAK_STATEMENT(p: yacc.YaccProduction):
     """
     BREAK_STATEMENT : BREAK SEMICOLON
     """
@@ -165,11 +142,11 @@ def p_BREAK_STATEMENT(p: yacc.YaccProduction) -> None:
                 # Get error line number and raise an error
                 error_lineno = p.lineno(2)
                 raise InvalidBreakError(
-                    f"Operador 'break' inválido na linha {error_lineno}"
+                    f"Invalid break operator at {error_lineno}"
                 )
 
 
-def p_VARDECL(p: yacc.YaccProduction) -> None:
+def p_VARDECL(p: yacc.YaccProduction):
     """
     VARDECL : DATATYPE LABEL OPTIONAL_VECTOR
     """
@@ -193,7 +170,7 @@ def p_VARDECL(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_OPTIONAL_VECTOR(p: yacc.YaccProduction) -> None:
+def p_OPTIONAL_VECTOR(p: yacc.YaccProduction):
     """
     OPTIONAL_VECTOR : LEFT_SQUARE_BRACKET INTEGER_CONSTANT RIGHT_SQUARE_BRACKET OPTIONAL_VECTOR
                     | empty
@@ -205,7 +182,7 @@ def p_OPTIONAL_VECTOR(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_ATRIB_RIGHT(p: yacc.YaccProduction) -> None:
+def p_ATRIB_RIGHT(p):
     """
     ATRIB_RIGHT : ALLOCEXPRESSION
                 | EXPRESSION_OR_FUNCCALL
@@ -213,7 +190,7 @@ def p_ATRIB_RIGHT(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_EXPRESSION_OR_FUNCCALL_PLUS(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION_OR_FUNCCALL_PLUS(p: yacc.YaccProduction):
     """
     EXPRESSION_OR_FUNCCALL : PLUS FACTOR RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
                            | MINUS FACTOR RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
@@ -237,7 +214,7 @@ def p_EXPRESSION_OR_FUNCCALL_PLUS(p: yacc.YaccProduction) -> None:
     expressions.append(right_node)
 
 
-def p_EXPRESSION_OR_FUNCCALL_INTEGER_CONSTANT(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION_OR_FUNCCALL_INTEGER_CONSTANT(p: yacc.YaccProduction):
     """
     EXPRESSION_OR_FUNCCALL : INTEGER_CONSTANT RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
     """
@@ -260,7 +237,7 @@ def p_EXPRESSION_OR_FUNCCALL_INTEGER_CONSTANT(p: yacc.YaccProduction) -> None:
     expressions.append((node, p.lineno(2)))
 
 
-def p_EXPRESSION_OR_FUNCCALL_FLOATING_POINT_CONSTANT(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION_OR_FUNCCALL_FLOATING_POINT_CONSTANT(p: yacc.YaccProduction):
     """
     EXPRESSION_OR_FUNCCALL : FLOATING_POINT_CONSTANT RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
     """
@@ -283,7 +260,7 @@ def p_EXPRESSION_OR_FUNCCALL_FLOATING_POINT_CONSTANT(p: yacc.YaccProduction) -> 
     expressions.append((node, p.lineno(2)))
 
 
-def p_EXPRESSION_OR_FUNCCALL_STRING_CONSTANT(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION_OR_FUNCCALL_STRING_CONSTANT(p: yacc.YaccProduction):
     """
     EXPRESSION_OR_FUNCCALL : STRING_CONSTANT RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
     """
@@ -306,14 +283,14 @@ def p_EXPRESSION_OR_FUNCCALL_STRING_CONSTANT(p: yacc.YaccProduction) -> None:
     expressions.append((node, p.lineno(1)))
 
 
-def p_EXPRESSION_OR_FUNCCALL_NULL(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION_OR_FUNCCALL_NULL(p):
     """
     EXPRESSION_OR_FUNCCALL : NULL RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
     """
     pass
 
 
-def p_EXPRESSION_OR_FUNCCALL_LEFT_PARENTHESIS(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION_OR_FUNCCALL_LEFT_PARENTHESIS(p: yacc.YaccProduction):
     """
     EXPRESSION_OR_FUNCCALL : LEFT_PARENTHESIS NUMEXPRESSION RIGHT_PARENTHESIS RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
     """
@@ -336,7 +313,7 @@ def p_EXPRESSION_OR_FUNCCALL_LEFT_PARENTHESIS(p: yacc.YaccProduction) -> None:
     expressions.append((node, p.lineno(1)))
 
 
-def p_EXPRESSION_OR_FUNCCALL_LABEL(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION_OR_FUNCCALL_LABEL(p: yacc.YaccProduction):
     """
     EXPRESSION_OR_FUNCCALL : LABEL FOLLOW_LABEL
     """
@@ -355,7 +332,7 @@ def p_EXPRESSION_OR_FUNCCALL_LABEL(p: yacc.YaccProduction) -> None:
         expressions.append((node, p.lineno(1)))
 
 
-def p_FOLLOW_LABEL_ALLOC(p: yacc.YaccProduction) -> None:
+def p_FOLLOW_LABEL_ALLOC(p: yacc.YaccProduction):
     """
     FOLLOW_LABEL : OPTIONAL_ALLOC_NUMEXPRESSION RECURSIVE_UNARYEXPR RECURSIVE_MINUS_OR_PLUS OPTIONAL_REL_OP_NUMEXPRESSION
     """
@@ -380,21 +357,21 @@ def p_FOLLOW_LABEL_ALLOC(p: yacc.YaccProduction) -> None:
     p[0] = {"vec_access": p[1], "node": node, "operation": operation}
 
 
-def p_FOLLOW_LABEL(p: yacc.YaccProduction) -> None:
+def p_FOLLOW_LABEL(p):
     """
     FOLLOW_LABEL : LEFT_PARENTHESIS PARAMLISTCALL RIGHT_PARENTHESIS
     """
     pass
 
 
-def p_ATRIBSTAT(p: yacc.YaccProduction) -> None:
+def p_ATRIBSTAT(p):
     """
     ATRIBSTAT : LVALUE ATTRIBUTION ATRIB_RIGHT
     """
     pass
 
 
-def p_PARAMLISTCALL(p: yacc.YaccProduction) -> None:
+def p_PARAMLISTCALL(p):
     """
     PARAMLISTCALL : LABEL PARAMLISTCALLTMP
                   | empty
@@ -402,7 +379,7 @@ def p_PARAMLISTCALL(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_PARAMLISTCALLTMP(p: yacc.YaccProduction) -> None:
+def p_PARAMLISTCALLTMP(p):
     """
     PARAMLISTCALLTMP : COMMA PARAMLISTCALL
                      | empty
@@ -410,35 +387,35 @@ def p_PARAMLISTCALLTMP(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_PRINTSTAT(p: yacc.YaccProduction) -> None:
+def p_PRINTSTAT(p):
     """
     PRINTSTAT : PRINT EXPRESSION
     """
     pass
 
 
-def p_READSTAT(p: yacc.YaccProduction) -> None:
+def p_READSTAT(p):
     """
     READSTAT : READ LVALUE
     """
     pass
 
 
-def p_RETURNSTAT(p: yacc.YaccProduction) -> None:
+def p_RETURNSTAT(p):
     """
     RETURNSTAT : RETURN
     """
     pass
 
 
-def p_IFSTAT(p: yacc.YaccProduction) -> None:
+def p_IFSTAT(p):
     """
     IFSTAT : IF LEFT_PARENTHESIS EXPRESSION RIGHT_PARENTHESIS NEW_SCOPE LEFT_BRACKET STATELIST RIGHT_BRACKET OPTIONAL_ELSE
     """
     scopes.pop()
 
 
-def p_OPTIONAL_ELSE(p: yacc.YaccProduction) -> None:
+def p_OPTIONAL_ELSE(p: yacc.YaccProduction):
     """
     OPTIONAL_ELSE : ELSE NEW_SCOPE LEFT_BRACKET STATELIST RIGHT_BRACKET
                   | empty
@@ -449,21 +426,21 @@ def p_OPTIONAL_ELSE(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_FORSTAT(p: yacc.YaccProduction) -> None:
+def p_FORSTAT(p):
     """
     FORSTAT : FOR LEFT_PARENTHESIS ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RIGHT_PARENTHESIS NEW_LOOP_SCOPE STATEMENT
     """
     scopes.pop()
 
 
-def p_STATELIST(p: yacc.YaccProduction) -> None:
+def p_STATELIST(p):
     """
     STATELIST : STATEMENT OPTIONAL_STATELIST
     """
     pass
 
 
-def p_OPTIONAL_STATELIST(p: yacc.YaccProduction) -> None:
+def p_OPTIONAL_STATELIST(p):
     """
     OPTIONAL_STATELIST : STATELIST
                        | empty
@@ -471,7 +448,7 @@ def p_OPTIONAL_STATELIST(p: yacc.YaccProduction) -> None:
     pass
 
 
-def p_ALLOCEXPRESSION(p: yacc.YaccProduction) -> None:
+def p_ALLOCEXPRESSION(p: yacc.YaccProduction):
     """
     ALLOCEXPRESSION : NEW DATATYPE LEFT_SQUARE_BRACKET NUMEXPRESSION RIGHT_SQUARE_BRACKET OPTIONAL_ALLOC_NUMEXPRESSION
     """
@@ -479,7 +456,7 @@ def p_ALLOCEXPRESSION(p: yacc.YaccProduction) -> None:
     expressions.append((numexpr["node"], p.lineno(1)))
 
 
-def p_OPTIONAL_ALLOC_NUMEXPRESSION(p: yacc.YaccProduction) -> None:
+def p_OPTIONAL_ALLOC_NUMEXPRESSION(p: yacc.YaccProduction):
     """
     OPTIONAL_ALLOC_NUMEXPRESSION : LEFT_SQUARE_BRACKET NUMEXPRESSION RIGHT_SQUARE_BRACKET OPTIONAL_ALLOC_NUMEXPRESSION
                                  | empty
@@ -495,7 +472,7 @@ def p_OPTIONAL_ALLOC_NUMEXPRESSION(p: yacc.YaccProduction) -> None:
         p[0] = f"[{str(numexpr)}]{optional_numexpr}"
 
 
-def p_EXPRESSION(p: yacc.YaccProduction) -> None:
+def p_EXPRESSION(p: yacc.YaccProduction):
     """
     EXPRESSION : NUMEXPRESSION OPTIONAL_REL_OP_NUMEXPRESSION
     """
@@ -504,7 +481,7 @@ def p_EXPRESSION(p: yacc.YaccProduction) -> None:
     expressions.append((numexpr_node, p.lineno(1)))
 
 
-def p_OPTIONAL_REL_OP_NUMEXPRESSION(p: yacc.YaccProduction) -> None:
+def p_OPTIONAL_REL_OP_NUMEXPRESSION(p: yacc.YaccProduction):
     """
     OPTIONAL_REL_OP_NUMEXPRESSION : REL_OP NUMEXPRESSION
                                   | empty
@@ -517,38 +494,38 @@ def p_OPTIONAL_REL_OP_NUMEXPRESSION(p: yacc.YaccProduction) -> None:
         expressions.append((numexpr_node, p.lineno(1)))
 
 
-def p_REL_OP_LESSER_THAN(p: yacc.YaccProduction) -> None:
+def p_REL_OP_LESSER_THAN(p: yacc.YaccProduction):
     """
     REL_OP : LESSER_THAN
     """
     pass
 
 
-def p_REL_OP_GREATER_THAN(p: yacc.YaccProduction) -> None:
+def p_REL_OP_GREATER_THAN(p: yacc.YaccProduction):
     """REL_OP : GREATER_THAN"""
     pass
 
 
-def p_REL_OP_LOWER_OR_EQUAL_THAN(p: yacc.YaccProduction) -> None:
+def p_REL_OP_LOWER_OR_EQUAL_THAN(p: yacc.YaccProduction):
     """REL_OP : LESS_OR_EQUAL_THAN"""
     pass
 
 
-def p_REL_OP_GREATER_OR_EQUAL_THAN(p: yacc.YaccProduction) -> None:
+def p_REL_OP_GREATER_OR_EQUAL_THAN(p: yacc.YaccProduction):
     """REL_OP : GREATER_OR_EQUAL_THAN"""
 
 
-def p_REL_OP_EQUAL(p: yacc.YaccProduction) -> None:
+def p_REL_OP_EQUAL(p: yacc.YaccProduction):
     """REL_OP : EQUAL"""
     pass
 
 
-def p_REL_OP_NOT_EQUAL(p: yacc.YaccProduction) -> None:
+def p_REL_OP_NOT_EQUAL(p: yacc.YaccProduction):
     """REL_OP : NOT_EQUAL"""
     pass
 
 
-def p_NUMEXPRESSION(p: yacc.YaccProduction) -> None:
+def p_NUMEXPRESSION(p: yacc.YaccProduction):
     """
     NUMEXPRESSION : TERM RECURSIVE_MINUS_OR_PLUS
     """
@@ -567,7 +544,7 @@ def p_NUMEXPRESSION(p: yacc.YaccProduction) -> None:
         }
 
 
-def p_RECURSIVE_MINUS_OR_PLUS(p: yacc.YaccProduction) -> None:
+def p_RECURSIVE_MINUS_OR_PLUS(p: yacc.YaccProduction):
     """
     RECURSIVE_MINUS_OR_PLUS : MINUS_OR_PLUS TERM RECURSIVE_MINUS_OR_PLUS
                             | empty
@@ -590,7 +567,7 @@ def p_RECURSIVE_MINUS_OR_PLUS(p: yacc.YaccProduction) -> None:
         p[0] = {"node": p[2]["node"], "operation": p[1]["operation"]}
 
 
-def p_MINUS_OR_PLUS(p: yacc.YaccProduction) -> None:
+def p_MINUS_OR_PLUS(p: yacc.YaccProduction):
     """
     MINUS_OR_PLUS : MINUS
                   | PLUS
@@ -598,7 +575,7 @@ def p_MINUS_OR_PLUS(p: yacc.YaccProduction) -> None:
     p[0] = {"operation": p[1]}
 
 
-def p_TERM(p: yacc.YaccProduction) -> None:
+def p_TERM(p: yacc.YaccProduction):
     """
     TERM : UNARYEXPR RECURSIVE_UNARYEXPR
     """
@@ -622,7 +599,7 @@ def p_TERM(p: yacc.YaccProduction) -> None:
 
 
 # Tuple(operator, term)
-def p_RECURSIVE_UNARYEXPR(p: yacc.YaccProduction) -> None:
+def p_RECURSIVE_UNARYEXPR(p: yacc.YaccProduction):
     """
     RECURSIVE_UNARYEXPR : UNARYEXPR_OPERATOR TERM
                         | empty
@@ -635,7 +612,7 @@ def p_RECURSIVE_UNARYEXPR(p: yacc.YaccProduction) -> None:
         p[0] = None
 
 
-def p_UNARYEXPR_OPERATOR(p: yacc.YaccProduction) -> None:
+def p_UNARYEXPR_OPERATOR(p: yacc.YaccProduction):
     """
     UNARYEXPR_OPERATOR : TIMES
                        | DIVISION
@@ -644,7 +621,7 @@ def p_UNARYEXPR_OPERATOR(p: yacc.YaccProduction) -> None:
     p[0] = {"operation": p[1]}
 
 
-def p_UNARYEXPR_MINUS_PLUS(p: yacc.YaccProduction) -> None:
+def p_UNARYEXPR_MINUS_PLUS(p: yacc.YaccProduction):
     """
     UNARYEXPR : MINUS_OR_PLUS FACTOR
     """
@@ -655,49 +632,49 @@ def p_UNARYEXPR_MINUS_PLUS(p: yacc.YaccProduction) -> None:
     p[0] = factor
 
 
-def p_UNARYEXPR_FACTOR(p: yacc.YaccProduction) -> None:
+def p_UNARYEXPR_FACTOR(p: yacc.YaccProduction):
     """
     UNARYEXPR : FACTOR
     """
     p[0] = p[1]
 
 
-def p_FACTOR_INT_CONST(p: yacc.YaccProduction) -> None:
+def p_FACTOR_INT_CONST(p: yacc.YaccProduction):
     """
     FACTOR : INTEGER_CONSTANT
     """
     p[0] = {"node": TreeNode(None, None, p[1], "int")}
 
 
-def p_FACTOR_FLOAT_CONST(p: yacc.YaccProduction) -> None:
+def p_FACTOR_FLOAT_CONST(p: yacc.YaccProduction):
     """
     FACTOR : FLOATING_POINT_CONSTANT
     """
     p[0] = {"node": TreeNode(None, None, p[1], "float")}
 
 
-def p_FACTOR_STRING_CONSTANT(p: yacc.YaccProduction) -> None:
+def p_FACTOR_STRING_CONSTANT(p: yacc.YaccProduction):
     """
     FACTOR : STRING_CONSTANT
     """
     p[0] = {"node": TreeNode(None, None, p[1], "string")}
 
 
-def p_FACTOR_NULL(p: yacc.YaccProduction) -> None:
+def p_FACTOR_NULL(p: yacc.YaccProduction):
     """
     FACTOR : NULL
     """
     p[0] = {"node": TreeNode(None, None, None, "null")}
 
 
-def p_FACTOR_LVALUE(p: yacc.YaccProduction) -> None:
+def p_FACTOR_LVALUE(p: yacc.YaccProduction):
     """
     FACTOR : LVALUE
     """
     p[0] = p[1]
 
 
-def p_FACTOR_EXPR(p: yacc.YaccProduction) -> None:
+def p_FACTOR_EXPR(p: yacc.YaccProduction):
     """
     FACTOR : LEFT_PARENTHESIS NUMEXPRESSION RIGHT_PARENTHESIS
     """
@@ -707,7 +684,7 @@ def p_FACTOR_EXPR(p: yacc.YaccProduction) -> None:
     expressions.append((numexpr_node, p.lineno(1)))
 
 
-def p_LVALUE(p: yacc.YaccProduction) -> None:
+def p_LVALUE(p: yacc.YaccProduction):
     """
     LVALUE : LABEL OPTIONAL_ALLOC_NUMEXPRESSION
     """
@@ -727,23 +704,23 @@ def p_LVALUE(p: yacc.YaccProduction) -> None:
 # --- Extra productions ---
 
 
-def p_error(p: yacc.YaccProduction) -> None:
+def p_error(p: yacc.YaccProduction):
     raise InvalidSyntaxError(f"Syntax error at token {p}")
 
 
-def p_empty(p: yacc.YaccProduction) -> None:
+def p_empty(p: yacc.YaccProduction):
     "empty :"
     pass
 
 
-def p_NEW_SCOPE(p: yacc.YaccProduction) -> None:
+def p_NEW_SCOPE(p: yacc.YaccProduction):
     """
     NEW_SCOPE :
     """
     create_scope(False)
 
 
-def p_NEW_SCOPE_LOOP(p: yacc.YaccProduction) -> None:
+def p_NEW_SCOPE_LOOP(p: yacc.YaccProduction):
     """
     NEW_LOOP_SCOPE :
     """
@@ -753,7 +730,7 @@ def p_NEW_SCOPE_LOOP(p: yacc.YaccProduction) -> None:
 # --- Util functions ---
 
 
-def create_scope(loop: bool) -> None:
+def create_scope(loop: bool):
     """
     Scope management list
     """
@@ -764,7 +741,7 @@ def create_scope(loop: bool) -> None:
     scopes.push(new)
 
 
-def get_variable_type(label: str, lineno: int) -> Any:
+def get_variable_type(label: str, lineno: int):
     """
     Get variable type
     Used during TreeNode construction in LVALUEs
@@ -781,11 +758,11 @@ def get_variable_type(label: str, lineno: int) -> Any:
     raise VariableNotDeclared(f"Variável não declarada '{label}' na linha: {lineno})")
 
 
-def numexpression_as_dict() -> List[Dict]:
-    exp_dict = []
+def numexpression_as_dict() -> list:
+    exp_dict = list()
 
     for exp, lineno in expressions:
-        if exp.left == None and exp.right == None:
+        if exp.left is None and exp.right is None:
             continue
 
         exp_dict.append(
@@ -793,4 +770,4 @@ def numexpression_as_dict() -> List[Dict]:
         )
     pprint(exp_dict)
 
-    return exp_dict
+    return exp_dict  # As a list of dicts.
