@@ -1,8 +1,9 @@
 [tool.poetry]
-name = "lexical_analyzer"
+name = "not-a-hat"
 version = "0.1.0"
 description = ""
-authors = ["Lucas Zacchi <zacchilucasm@gmail.com>"]
+authors = ["vdella <vitor.origamer@gmail.com>"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.6.9"
