@@ -144,4 +144,8 @@ parser.out
 # Syntax analyser grammar output
 parsetab.py
 
+# Output dir will be generated during execution.
 output/
+
+# Disables all discipline reports from getting into the repo history.
+*.pdf
