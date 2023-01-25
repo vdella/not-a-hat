@@ -27,9 +27,9 @@ def average_notes_calculator() {
   print "defining functions";
   print "initializing students";
 
-  student_name[0] = "Artur";
-  student_name[1] = "Lucas V";
-  student_name[2] = "Lucas Z";
+  student_name[0] = "José";
+  student_name[1] = "Vinicius";
+  student_name[2] = "Miguel";
   student_name[3] = "Afonso";
   student_name[4] = "Alonso";
   student_name[5] = "Antonio";
