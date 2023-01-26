@@ -4,6 +4,7 @@ from reader import parse_arguments
 from writer import print_separator
 from syntax import *
 
+
 def main(vargs: Namespace) -> None:
     with open(vargs.src) as f:
         src = f.read()
@@ -13,7 +14,7 @@ def main(vargs: Namespace) -> None:
     analyser.input(src)
 
     try:
-        token_list = analyser.token_list()
+        analyser.token_list()
     except Exception as err:
         print(f"Tokenization error: {err}")
         sys.exit(-1)
@@ -21,7 +22,7 @@ def main(vargs: Namespace) -> None:
     print_separator()
 
     try:
-        syntax_result = yacc.yacc(
+        yacc.yacc(
             debug=vargs.debug,
         ).parse(src, debug=vargs.debug, lexer=analyser)
     except Exception as error:
